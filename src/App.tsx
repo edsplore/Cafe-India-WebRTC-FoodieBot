@@ -152,7 +152,7 @@ const App = () => {
           KFC
         </div>
         <main className="flex-grow flex flex-col items-center justify-center p-4 text-center relative">
-          <img src="/KFC_logo.png" alt="KFC Logo" className="w-32 h-32 mb-4" />
+          <img src="/KFC_logo.png" alt="KFC Logo" className="w-32 mb-4" />
           <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white font-serif">KFC's Menu Assistant</h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl text-white font-light">BrainCX</p>
 
