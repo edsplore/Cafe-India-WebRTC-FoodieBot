@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { RetellWebClient } from "retell-client-js-sdk";
-import { Mic, X } from "lucide-react";
-import { BiChat, BiMenu } from "react-icons/bi"; // Importing the icons
+import { Mic, X, Phone, MapPin, Clock } from "lucide-react";
+import { BiMenu } from "react-icons/bi";
 
 interface RegisterCallResponse {
   access_token?: string;
@@ -15,11 +15,11 @@ const webClient = new RetellWebClient();
 const GradientBackground: React.FC = ({ children }) => {
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-100 to-white opacity-90"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-50"></div>
-      <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-gray-100 to-transparent opacity-50"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-red-600 via-red-700 to-red-800 opacity-90"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-red-500 to-transparent opacity-50"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-red-600 to-transparent opacity-50"></div>
       <div className="absolute inset-0">
-        <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMzUpIj48bGluZSB4MT0iMCIgeT0iMCIgeDI9IjQwIiB5Mj0iNDAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2Utb3BhY2l0eT0iMC4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')] opacity-10"></div>
+        <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMzUpIj48bGluZSB4MT0iMCIgeT0iMCIgeDI9IjQwIiB5Mj0iNDAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2Utb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+')] opacity-20"></div>
       </div>
       <div className="relative z-10">{children}</div>
     </div>
@@ -28,29 +28,27 @@ const GradientBackground: React.FC = ({ children }) => {
 
 const App = () => {
   const [callStatus, setCallStatus] = useState<"not-started" | "active" | "inactive">("not-started");
-  const [callInProgress, setCallInProgress] = useState(false); // Flag to track call setup progress
+  const [callInProgress, setCallInProgress] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
-  // UseEffect for initializing the WebClient and adding error handling
   useEffect(() => {
-    // Adding event listeners for the webClient
     webClient.on("conversationStarted", () => {
       console.log("Conversation started successfully");
       setCallStatus("active");
-      setCallInProgress(false); // Reset flag after conversation starts
+      setCallInProgress(false);
     });
 
     webClient.on("conversationEnded", ({ code, reason }) => {
       console.log("Conversation ended with code:", code, "reason:", reason);
       setCallStatus("inactive");
-      setCallInProgress(false); // Reset flag after conversation ends
+      setCallInProgress(false);
     });
 
     webClient.on("error", (error) => {
       console.error("An error occurred:", error);
       setCallStatus("inactive");
-      setCallInProgress(false); // Reset flag on error
-      // No runtime errors are shown to the user
+      setCallInProgress(false);
     });
 
     webClient.on("update", (update) => {
@@ -67,39 +65,34 @@ const App = () => {
 
   const toggleConversation = async () => {
     if (callInProgress) {
-      return; // Prevent multiple calls if call is in progress
+      return;
     }
 
-    setCallInProgress(true); // Set the flag when call starts
+    setCallInProgress(true);
 
     if (callStatus === "active") {
-      // Stop the call when active
       try {
-        await webClient.stopCall(); // Ensure the stop call is awaited properly
+        await webClient.stopCall();
         setCallStatus("inactive");
       } catch (error) {
         console.error("Error stopping the call:", error);
       } finally {
-        setCallInProgress(false); // Reset flag after stopping
+        setCallInProgress(false);
       }
     } else {
-      // Try starting the conversation when inactive or not started
       try {
-        // Request microphone permission
         await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Start the conversation
         await initiateConversation();
       } catch (error) {
         console.error("Microphone permission denied or error occurred:", error);
-        // Do not show any runtime errors to the user
       } finally {
-        setCallInProgress(false); // Reset flag whether call starts or fails
+        setCallInProgress(false);
       }
     }
   };
 
   const initiateConversation = async () => {
-    const agentId = "agent_a24294c8982b75e8fbeb46b7ba"; // Default agent ID
+    const agentId = "agent_1bb936e6d51646af7835070875";
     try {
       const registerCallResponse = await registerCall(agentId);
       if (registerCallResponse.callId) {
@@ -113,15 +106,13 @@ const App = () => {
       }
     } catch (error) {
       console.error("Error in registering or starting the call:", error);
-      // Do not show any runtime errors to the user
     }
   };
 
-  // Function for registering a call
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     console.log("Registering call for agent:", agentId);
 
-    const apiKey = "key_739b6a1ddbcb56a96028bff7089b"; // Replace with your real API key
+    const apiKey = "key_2a0119367b21b986251edd0025a6";
     const sampleRate = parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10);
 
     try {
@@ -150,56 +141,51 @@ const App = () => {
       };
     } catch (err) {
       console.error("Error registering call:", err);
-      throw err; // Re-throw the error to be handled in the caller
+      throw err;
     }
   }
 
   return (
     <GradientBackground>
       <div className="min-h-screen flex flex-col font-sans">
-        <div className="text-3xl font-bold text-green-700 font-serif p-4 absolute top-0 left-0">
-          Foodie Bot
+        <div className="text-3xl font-bold text-white font-serif p-4 absolute top-0 left-0">
+          KFC
         </div>
         <main className="flex-grow flex flex-col items-center justify-center p-4 text-center relative">
-          <img src="/Cafe_India_Logo_Transparent.png" alt="Cafe India Logo" className="w-32 h-32 mb-4" />
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 text-green-800 font-serif">Cafe India's Menu Assistant</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl text-gray-700 font-light">Siri for Restaurant Menu</p>
+          <img src="/KFC_logo.png" alt="KFC Logo" className="w-32 h-32 mb-4" />
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white font-serif">KFC's Menu Assistant</h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-2xl text-white font-light">BrainCX</p>
 
           <div className="relative mb-8">
             <div
-              className={`relative z-10 bg-green-600 rounded-full p-8 cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 ${
-                callStatus === "active" ? "bg-red-600" : ""
+              className={`relative z-10 bg-white rounded-full p-8 cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                callStatus === "active" ? "bg-red-200" : ""
               }`}
               onClick={toggleConversation}
             >
-              <Mic className={`w-16 h-16 text-white ${callStatus === "active" ? "animate-bounce" : ""}`} />
+              <Mic className={`w-16 h-16 text-red-600 ${callStatus === "active" ? "animate-bounce" : ""}`} />
             </div>
             {callStatus === "active" && (
-              <div className="absolute inset-0 rounded-full border-4 border-green-300 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-white animate-ping"></div>
             )}
           </div>
 
-          {/* Buttons - Chat and Show Menu aligned */}
           <div className="flex space-x-4 justify-center mt-4">
             <button
-              className={`border border-green-600 text-green-600 hover:bg-green-50 px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-md font-medium flex items-center ${
+              className={`bg-white text-red-600 hover:bg-red-100 px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-md font-medium flex items-center ${
                 callInProgress ? "opacity-50 cursor-not-allowed" : ""
-              }`} // Disable during call setup
-              onClick={() =>
-                !callInProgress &&
-                (window.location.href =
-                  "https://creator.voiceflow.com/prototype/6715666db2c68d651862357a")
-              }
+              }`}
+              onClick={() => !callInProgress && setShowContact(true)}
               disabled={callInProgress}
             >
-              <BiChat className="mr-2" /> Chat Now!
+              <Phone className="mr-2" /> Contact Now
             </button>
 
             <button
-              className={`border border-green-600 text-green-600 hover:bg-green-50 px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-md font-medium flex items-center ${
+              className={`bg-white text-red-600 hover:bg-red-100 px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-md font-medium flex items-center ${
                 callInProgress ? "opacity-50 cursor-not-allowed" : ""
-              }`} // Disable during call setup
-              onClick={() => !callInProgress && (window.location.href = "https://nalasusa.com/")}
+              }`}
+              onClick={() => !callInProgress && setShowMenu(true)}
               disabled={callInProgress}
             >
               <BiMenu className="mr-2" /> Show Menu
@@ -215,9 +201,37 @@ const App = () => {
                 >
                   <X className="h-6 w-6" />
                 </button>
-                <h2 className="text-3xl font-bold text-green-800 mb-4">Cafe India's Menu</h2>
+                <h2 className="text-3xl font-bold text-red-600 mb-4">KFC Menu</h2>
                 <div className="overflow-y-auto flex-grow">
-                  <RestaurantMenu />
+                  <KFCMenu />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showContact && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="relative bg-white rounded-lg shadow-xl p-6 m-4 max-w-md w-full">
+                <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowContact(false)}
+                >
+                  <X className="h-6 w-6" />
+                </button>
+                <h2 className="text-2xl font-bold text-red-600 mb-4">Contact KFC</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Phone className="text-red-600 mr-2" />
+                    <p>1-800-CALL-KFC</p>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="text-red-600 mr-2" />
+                    <p>1441 Gardiner Lane, Louisville, KY 40213</p>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="text-red-600 mr-2" />
+                    <p>Open 24/7</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -228,9 +242,41 @@ const App = () => {
   );
 };
 
-const RestaurantMenu = () => (
+const KFCMenu = () => (
   <div className="text-left space-y-8">
-    {/* Menu sections can be added here */}
+    <section>
+      <h3 className="text-2xl font-bold text-red-600 mb-2">Chicken</h3>
+      <ul className="list-disc list-inside space-y-1">
+        <li>Original Recipe Chicken</li>
+        <li>Extra Crispy Chicken</li>
+        <li>Kentucky Grilled Chicken</li>
+        <li>Hot Wings</li>
+      </ul>
+    </section>
+    <section>
+      <h3 className="text-2xl font-bold text-red-600 mb-2">Sandwiches</h3>
+      <ul className="list-disc list-inside space-y-1">
+        <li>Chicken Sandwich</li>
+        <li>Spicy Chicken Sandwich</li>
+        <li>Crispy Colonel Sandwich</li>
+      </ul>
+    </section>
+    <section>
+      <h3 className="text-2xl font-bold text-red-600 mb-2">Sides</h3>
+      <ul className="list-disc list-inside space-y-1">
+        <li>Mashed Potatoes & Gravy</li>
+        <li>Cole Slaw</li>
+        <li>Biscuits</li>
+        <li>Mac & Cheese</li>
+      </ul>
+    </section>
+    <section>
+      <h3 className="text-2xl font-bold text-red-600 mb-2">Desserts</h3>
+      <ul className="list-disc list-inside space-y-1">
+        <li>Chocolate Chip Cookie</li>
+        <li>Cake</li>
+      </ul>
+    </section>
   </div>
 );
 
