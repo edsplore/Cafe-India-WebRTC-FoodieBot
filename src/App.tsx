@@ -112,7 +112,7 @@ const App = () => {
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     console.log("Registering call for agent:", agentId);
 
-    const apiKey = "key_2a0119367b21b986251edd0025a6";
+    const apiKey = "02e501b4-1b05-40f4-af3e-351f0819e13f";
     const sampleRate = parseInt(process.env.REACT_APP_RETELL_SAMPLE_RATE || "16000", 10);
 
     try {
